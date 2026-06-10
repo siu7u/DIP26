@@ -39,5 +39,15 @@ class TrainOptions(BaseOptions):
         
         self.parser.add_argument('--lambda_gan', type=float, default=0.01, help='weight for gan loss')
         self.parser.add_argument('--lambda_vgg', type=float, default=0.1, help='weight for vgg loss')
+
+        # reflection-intensity prior branch
+        self.parser.add_argument('--use_rpen', action='store_true', help='predict a reflection-intensity prior before ERRNet')
+        self.parser.add_argument('--rpen_channels', type=int, default=32, help='base channels for the reflection prior extraction network')
+        self.parser.add_argument('--rpen_blocks', type=int, default=3, help='number of residual blocks in the reflection prior extraction network')
+        self.parser.add_argument('--rpen_patch_size', type=int, default=15, help='average-pooling kernel size used to make predicted prior patch-aware')
+        self.parser.add_argument('--rpen_target_smooth', type=int, default=15, help='average-pooling kernel size used to smooth reflection-prior labels')
+        self.parser.add_argument('--lambda_prior', type=float, default=1.0, help='weight for reflection-prior prediction loss')
+        self.parser.add_argument('--lambda_bg', type=float, default=0.5, help='weight for background preservation loss in low-prior regions')
+        self.parser.add_argument('--lambda_prior_tv', type=float, default=0.00005, help='weight for TV smoothness loss on predicted reflection prior')
         
         self.isTrain = True
