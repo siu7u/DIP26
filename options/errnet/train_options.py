@@ -39,5 +39,13 @@ class TrainOptions(BaseOptions):
         
         self.parser.add_argument('--lambda_gan', type=float, default=0.01, help='weight for gan loss')
         self.parser.add_argument('--lambda_vgg', type=float, default=0.1, help='weight for vgg loss')
+
+        # reflection detection branch before ERRNet
+        self.parser.add_argument('--use_rdnet', action='store_true', help='predict a reflection-region mask before ERRNet')
+        self.parser.add_argument('--rdnet_channels', type=int, default=32, help='base channels for the reflection detection network')
+        self.parser.add_argument('--rdnet_blocks', type=int, default=3, help='number of residual blocks in the reflection detection network')
+        self.parser.add_argument('--rdnet_mask_smooth', type=int, default=9, help='average-pooling kernel size used to smooth MaxRF mask labels')
+        self.parser.add_argument('--lambda_rd', type=float, default=1.0, help='weight for supervised reflection mask prediction loss')
+        self.parser.add_argument('--lambda_rd_tv', type=float, default=0.00005, help='weight for TV smoothness loss on predicted reflection masks')
         
         self.isTrain = True

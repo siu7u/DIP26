@@ -75,6 +75,79 @@ class EdgeMap(nn.Module):
         return edge
 
 
+class ReflectionDetectionNet(nn.Module):
+    """Lightweight reflection-region detector used before ERRNet."""
+    def __init__(self, in_channels=3, base_channels=32, n_blocks=3):
+        super(ReflectionDetectionNet, self).__init__()
+        layers = [
+            nn.Conv2d(in_channels, base_channels, kernel_size=3, padding=1),
+            nn.ReLU(True),
+            nn.Conv2d(base_channels, base_channels, kernel_size=3, padding=1),
+            nn.ReLU(True),
+        ]
+        for _ in range(n_blocks):
+            layers.append(ResidualMaskBlock(base_channels))
+        layers.extend([
+            nn.Conv2d(base_channels, base_channels // 2, kernel_size=3, padding=1),
+            nn.ReLU(True),
+            nn.Conv2d(base_channels // 2, 1, kernel_size=1),
+            nn.Sigmoid(),
+        ])
+        self.net = nn.Sequential(*layers)
+
+    def forward(self, x):
+        return self.net(x)
+
+
+class ResidualMaskBlock(nn.Module):
+    def __init__(self, channels):
+        super(ResidualMaskBlock, self).__init__()
+        self.body = nn.Sequential(
+            nn.Conv2d(channels, channels, kernel_size=3, padding=1),
+            nn.ReLU(True),
+            nn.Conv2d(channels, channels, kernel_size=3, padding=1),
+        )
+
+    def forward(self, x):
+        return F.relu(x + self.body(x), inplace=True)
+
+
+class TVLoss(nn.Module):
+    def forward(self, x):
+        loss_h = torch.mean(torch.abs(x[:, :, 1:, :] - x[:, :, :-1, :]))
+        loss_w = torch.mean(torch.abs(x[:, :, :, 1:] - x[:, :, :, :-1]))
+        return loss_h + loss_w
+
+
+def _load_state_dict_flexible(module, state_dict, module_name):
+    module_state = module.state_dict()
+    filtered_state = {}
+    skipped = []
+    for key, value in state_dict.items():
+        if key in module_state and module_state[key].shape == value.shape:
+            filtered_state[key] = value
+        elif (
+            key in module_state
+            and value.dim() == 4
+            and module_state[key].dim() == 4
+            and module_state[key].shape[0] == value.shape[0]
+            and module_state[key].shape[2:] == value.shape[2:]
+            and module_state[key].shape[1] == value.shape[1] + 1
+        ):
+            expanded = module_state[key].clone()
+            expanded[:, :value.shape[1], :, :] = value
+            expanded[:, value.shape[1]:, :, :] = 0
+            filtered_state[key] = expanded
+            print('[i] expanded %s.%s with a zero-initialized mask channel' % (module_name, key))
+        else:
+            skipped.append(key)
+    module_state.update(filtered_state)
+    module.load_state_dict(module_state)
+    if skipped:
+        print('[i] skipped %d incompatible %s keys: %s' % (
+            len(skipped), module_name, ', '.join(skipped[:5])))
+
+
 class ERRNetBase(BaseModel):
     def _init_optimizer(self, optimizers):
         self.optimizers = optimizers
@@ -195,6 +268,9 @@ class ERRNetModel(ERRNetBase):
 
     def print_network(self):
         print('--------------------- Model ---------------------')
+        if self.opt.use_rdnet:
+            print('##################### RDNet #####################')
+            networks.print_network(self.net_rd)
         print('##################### NetG #####################')
         networks.print_network(self.net_i)
         if self.isTrain and self.opt.lambda_gan > 0:
@@ -202,9 +278,13 @@ class ERRNetModel(ERRNetBase):
             networks.print_network(self.netD)
 
     def _eval(self):
+        if self.opt.use_rdnet:
+            self.net_rd.eval()
         self.net_i.eval()
 
     def _train(self):
+        if self.opt.use_rdnet:
+            self.net_rd.train()
         self.net_i.train()
 
     def initialize(self, opt):
@@ -213,6 +293,17 @@ class ERRNetModel(ERRNetBase):
 
         in_channels = 3
         self.vgg = None
+        self.net_rd = None
+        self.tv_loss = TVLoss()
+        self.loss_rd = None
+        self.loss_rd_tv = None
+        self.reflection_mask = None
+        self.target_reflection_mask = None
+
+        if opt.use_rdnet:
+            self.net_rd = ReflectionDetectionNet(3, opt.rdnet_channels, opt.rdnet_blocks).to(self.device)
+            networks.init_weights(self.net_rd, init_type=opt.init_type)
+            in_channels += 1
         
         if opt.hyper:
             self.vgg = losses.Vgg19(requires_grad=False).to(self.device)
@@ -251,7 +342,10 @@ class ERRNetModel(ERRNetBase):
             self._init_optimizer([self.optimizer_D])
 
             # initialize optimizers
-            self.optimizer_G = torch.optim.Adam(self.net_i.parameters(), 
+            g_params = list(self.net_i.parameters())
+            if self.opt.use_rdnet:
+                g_params += list(self.net_rd.parameters())
+            self.optimizer_G = torch.optim.Adam(g_params,
                 lr=opt.lr, betas=(0.9, 0.999), weight_decay=opt.wd)
 
             self._init_optimizer([self.optimizer_G])
@@ -281,6 +375,8 @@ class ERRNetModel(ERRNetBase):
         self.loss_icnn_pixel = None
         self.loss_icnn_vgg = None
         self.loss_G_GAN = None
+        self.loss_rd = None
+        self.loss_rd_tv = None
 
         if self.opt.lambda_gan > 0:
             self.loss_G_GAN = self.loss_dic['gan'].get_g_loss(
@@ -295,6 +391,12 @@ class ERRNetModel(ERRNetBase):
                 self.output_i, self.target_t)
 
             self.loss_G += self.loss_icnn_pixel+self.loss_icnn_vgg*self.opt.lambda_vgg
+
+            if self.opt.use_rdnet and self.opt.lambda_rd > 0:
+                self.loss_rd = F.l1_loss(self.reflection_mask, self.target_reflection_mask)
+                self.loss_rd_tv = self.tv_loss(self.reflection_mask)
+                self.loss_G += self.loss_rd * self.opt.lambda_rd
+                self.loss_G += self.loss_rd_tv * self.opt.lambda_rd_tv
         else:
             self.loss_CX = self.loss_dic['t_cx'].get_loss(self.output_i, self.target_t)
             
@@ -305,6 +407,9 @@ class ERRNetModel(ERRNetBase):
     def forward(self):
         # without edge
         input_i = self.input
+        if self.opt.use_rdnet:
+            self.reflection_mask = self.net_rd(self.input)
+            input_i = torch.cat([input_i, self.reflection_mask], dim=1)
 
         if self.vgg is not None:
             hypercolumn = self.vgg(self.input)
@@ -319,6 +424,20 @@ class ERRNetModel(ERRNetBase):
         self.output_i = output_i
 
         return output_i
+
+    def set_input(self, data, mode='train'):
+        super(ERRNetModel, self).set_input(data, mode)
+        self.target_reflection_mask = None
+        if self.opt.use_rdnet and self.target_t is not None:
+            self.target_reflection_mask = self.build_reflection_mask()
+
+    def build_reflection_mask(self):
+        mask = (self.input_edge > self.target_edge).float()
+        if self.opt.rdnet_mask_smooth > 1:
+            kernel_size = self.opt.rdnet_mask_smooth
+            padding = kernel_size // 2
+            mask = F.avg_pool2d(mask, kernel_size=kernel_size, stride=1, padding=padding)
+        return mask.clamp(0, 1).detach()
         
     def optimize_parameters(self):
         self._train()
@@ -346,6 +465,10 @@ class ERRNetModel(ERRNetBase):
 
         if self.loss_CX is not None:
             ret_errors['CX'] = self.loss_CX.item()
+        if self.loss_rd is not None:
+            ret_errors['RD'] = self.loss_rd.item()
+        if self.loss_rd_tv is not None:
+            ret_errors['RD_TV'] = self.loss_rd_tv.item()
 
         return ret_errors
 
@@ -354,6 +477,10 @@ class ERRNetModel(ERRNetBase):
         ret_visuals['input'] = tensor2im(self.input).astype(np.uint8)
         ret_visuals['output_i'] = tensor2im(self.output_i).astype(np.uint8)        
         ret_visuals['target'] = tensor2im(self.target_t).astype(np.uint8)
+        if self.opt.use_rdnet and self.reflection_mask is not None:
+            ret_visuals['reflection_mask'] = tensor2im(self.reflection_mask).astype(np.uint8)
+            if self.target_reflection_mask is not None:
+                ret_visuals['target_reflection_mask'] = tensor2im(self.target_reflection_mask).astype(np.uint8)
         ret_visuals['residual'] = tensor2im((self.input - self.output_i)).astype(np.uint8)
 
         return ret_visuals       
@@ -368,12 +495,23 @@ class ERRNetModel(ERRNetBase):
             state_dict = _torch_load_compat(model_path)
             model.epoch = state_dict['epoch']
             model.iterations = state_dict['iterations']
-            model.net_i.load_state_dict(state_dict['icnn'])
+            if model.opt.use_rdnet:
+                _load_state_dict_flexible(model.net_i, state_dict['icnn'], 'net_i')
+                if 'rdnet' in state_dict:
+                    model.net_rd.load_state_dict(state_dict['rdnet'])
+            else:
+                model.net_i.load_state_dict(state_dict['icnn'])
             if model.isTrain:
-                model.optimizer_G.load_state_dict(state_dict['opt_g'])
+                if (not model.opt.use_rdnet) or ('rdnet' in state_dict):
+                    model.optimizer_G.load_state_dict(state_dict['opt_g'])
         else:
             state_dict = _torch_load_compat(icnn_path, map_location=torch.device('cpu'))
-            model.net_i.load_state_dict(state_dict['icnn'])
+            if model.opt.use_rdnet:
+                _load_state_dict_flexible(model.net_i, state_dict['icnn'], 'net_i')
+                if 'rdnet' in state_dict:
+                    model.net_rd.load_state_dict(state_dict['rdnet'])
+            else:
+                model.net_i.load_state_dict(state_dict['icnn'])
             model.epoch = state_dict['epoch']
             model.iterations = state_dict['iterations']
             # if model.isTrain:
@@ -394,6 +532,8 @@ class ERRNetModel(ERRNetBase):
             'opt_g': self.optimizer_G.state_dict(), 
             'epoch': self.epoch, 'iterations': self.iterations
         }
+        if self.opt.use_rdnet:
+            state_dict['rdnet'] = self.net_rd.state_dict()
 
         if self.opt.lambda_gan > 0:
             state_dict.update({
