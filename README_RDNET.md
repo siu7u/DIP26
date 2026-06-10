@@ -4,6 +4,8 @@
 
 ## 思路来源
 
+https://arxiv.org/abs/2311.17320
+
 原始 ERRNet 是一个全局图像到图像的恢复网络，输入带反射图像，直接输出去反射后的 transmission/background 图像。这个设计在合成数据和严格对齐数据上比较有效，但真实反射往往具有明显的空间不均匀性：有些区域存在强烈局部反射，而很多背景区域其实不应该被过度修改。
 
 近年的去反射工作，例如 *Revisiting Single Image Reflection Removal In the Wild*（CVPR 2024），强调了反射区域感知的重要性。该工作中的 MaxRF 思路通过比较混合输入图像和干净 transmission 图像的边缘强度来估计局部反射区域。如果输入图像在某个位置的梯度强于干净目标图像，那么这个位置更可能包含局部反射。
