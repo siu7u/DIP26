@@ -69,7 +69,7 @@ Supported benchmark names:
 
 ```bash
 # gpu
-python test_errnet.py --name errnet --dataset [dataset] -r --icnn_path checkpoints/errnet/errnet_060_00463920.pt --hyper
+python test_errnet.py --name errnet --dataset  CEILNet -r --icnn_path checkpoints/errnet/errnet_060_00463920.pt --hyper
 # cpu
 python test_errnet.py --name errnet_cpu --dataset [dataset] -r --gpu_ids -1 --icnn_path checkpoints/errnet/errnet_060_00463920.pt --hyper
 ```

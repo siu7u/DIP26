@@ -10,13 +10,13 @@ class PyramidPooling(nn.Module):
         self.stages = []
         self.stages = nn.ModuleList([self._make_stage(in_channels, scale, ct_channels) for scale in scales])
         self.bottleneck = nn.Conv2d(in_channels + len(scales) * ct_channels, out_channels, kernel_size=1, stride=1)
-        self.relu = nn.LeakyReLU(0.2, inplace=True)
+        self.relu = nn.LeakyReLU(0.2, inplace=False)
 
     def _make_stage(self, in_channels, scale, ct_channels):
         # prior = nn.AdaptiveAvgPool2d(output_size=(size, size))
         prior = nn.AvgPool2d(kernel_size=(scale, scale))
         conv = nn.Conv2d(in_channels, ct_channels, kernel_size=1, bias=False)
-        relu = nn.LeakyReLU(0.2, inplace=True)
+        relu = nn.LeakyReLU(0.2, inplace=False)
         return nn.Sequential(prior, conv, relu)
 
     def forward(self, feats):
@@ -31,7 +31,7 @@ class SELayer(nn.Module):
         self.avg_pool = nn.AdaptiveAvgPool2d(1)
         self.fc = nn.Sequential(
                 nn.Linear(channel, channel // reduction),
-                nn.ReLU(inplace=True),
+                nn.ReLU(inplace=False),
                 nn.Linear(channel // reduction, channel),
                 nn.Sigmoid()
         )
@@ -51,7 +51,7 @@ class DRNet(torch.nn.Module):
         # Initial convolution layers
         conv = nn.Conv2d
         deconv = nn.ConvTranspose2d
-        act = nn.ReLU(True)
+        act = nn.ReLU(False)
         
         self.pyramid_module = None
         self.conv1 = ConvLayer(conv, in_channels, n_feats, kernel_size=bottom_kernel_size, stride=1, norm=None, act=act)
@@ -105,7 +105,7 @@ class ConvLayer(torch.nn.Sequential):
 
 
 class ResidualBlock(torch.nn.Module):
-    def __init__(self, channels, dilation=1, norm=nn.BatchNorm2d, act=nn.ReLU(True), se_reduction=None, res_scale=1):
+    def __init__(self, channels, dilation=1, norm=nn.BatchNorm2d, act=nn.ReLU(False), se_reduction=None, res_scale=1):
         super(ResidualBlock, self).__init__()
         conv = nn.Conv2d
         self.conv1 = ConvLayer(conv, channels, channels, kernel_size=3, stride=1, dilation=dilation, norm=norm, act=act)

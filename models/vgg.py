@@ -11,6 +11,7 @@ class Vgg16(torch.nn.Module):
             vgg_pretrained_features = models.vgg16(weights=models.VGG16_Weights.IMAGENET1K_V1).features
         except AttributeError:
             vgg_pretrained_features = models.vgg16(pretrained=True).features
+        _disable_inplace_relu(vgg_pretrained_features)
         self.slice1 = torch.nn.Sequential()
         self.slice2 = torch.nn.Sequential()
         self.slice3 = torch.nn.Sequential()
@@ -48,6 +49,7 @@ class Vgg19(torch.nn.Module):
             self.vgg_pretrained_features = models.vgg19(weights=models.VGG19_Weights.IMAGENET1K_V1).features
         except AttributeError:
             self.vgg_pretrained_features = models.vgg19(pretrained=True).features
+        _disable_inplace_relu(self.vgg_pretrained_features)
         # self.slice1 = torch.nn.Sequential()
         # self.slice2 = torch.nn.Sequential()
         # self.slice3 = torch.nn.Sequential()
@@ -86,6 +88,12 @@ class Vgg19(torch.nn.Module):
         # h_relu5 = self.slice5(h_relu4)
         # out = [h_relu1, h_relu2, h_relu3, h_relu4, h_relu5]
         # return out
+
+
+def _disable_inplace_relu(module):
+    for child in module.modules():
+        if isinstance(child, torch.nn.ReLU):
+            child.inplace = False
 
 
 if __name__ == '__main__':

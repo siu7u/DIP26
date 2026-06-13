@@ -1,4 +1,5 @@
 from os.path import join
+from options import errnet
 from options.errnet.train_options import TrainOptions
 from engine import Engine
 from data.image_folder import read_fns

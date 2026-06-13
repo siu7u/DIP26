@@ -82,15 +82,15 @@ class ReflectionPriorExtractionNet(nn.Module):
         self.patch_size = patch_size
         layers = [
             nn.Conv2d(in_channels, base_channels, kernel_size=3, padding=1),
-            nn.ReLU(True),
+            nn.ReLU(False),
             nn.Conv2d(base_channels, base_channels, kernel_size=3, padding=1),
-            nn.ReLU(True),
+            nn.ReLU(False),
         ]
         for _ in range(n_blocks):
             layers.append(ResidualPriorBlock(base_channels))
         layers.extend([
             nn.Conv2d(base_channels, base_channels // 2, kernel_size=3, padding=1),
-            nn.ReLU(True),
+            nn.ReLU(False),
             nn.Conv2d(base_channels // 2, 1, kernel_size=1),
             nn.Sigmoid(),
         ])
@@ -109,12 +109,12 @@ class ResidualPriorBlock(nn.Module):
         super(ResidualPriorBlock, self).__init__()
         self.body = nn.Sequential(
             nn.Conv2d(channels, channels, kernel_size=3, padding=1),
-            nn.ReLU(True),
+            nn.ReLU(False),
             nn.Conv2d(channels, channels, kernel_size=3, padding=1),
         )
 
     def forward(self, x):
-        return F.relu(x + self.body(x), inplace=True)
+        return F.relu(x + self.body(x), inplace=False)
 
 
 class TVLoss(nn.Module):

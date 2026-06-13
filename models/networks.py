@@ -159,7 +159,7 @@ class NLayerDiscriminator(nn.Module):
         self.n_layers = n_layers
         kw = 4
         padw = int(np.ceil((kw-1.0)/2))
-        sequence = [[nn.Conv2d(input_nc*branch, ndf*branch, kernel_size=kw, stride=2, padding=padw, groups=branch, bias=True), nn.LeakyReLU(0.2, True)]]
+        sequence = [[nn.Conv2d(input_nc*branch, ndf*branch, kernel_size=kw, stride=2, padding=padw, groups=branch, bias=True), nn.LeakyReLU(0.2, False)]]
 
         nf = ndf
         for n in range(1, n_layers):
@@ -167,7 +167,7 @@ class NLayerDiscriminator(nn.Module):
             nf = min(nf * 2, 512)
             sequence += [[
                 nn.Conv2d(nf_prev*branch, nf*branch, groups=branch, kernel_size=kw, stride=2, padding=padw, bias=bias),
-                norm_layer(nf*branch), nn.LeakyReLU(0.2, True)
+                norm_layer(nf*branch), nn.LeakyReLU(0.2, False)
             ]]
 
         nf_prev = nf
@@ -175,7 +175,7 @@ class NLayerDiscriminator(nn.Module):
         sequence += [[
             nn.Conv2d(nf_prev*branch, nf*branch, groups=branch, kernel_size=kw, stride=1, padding=padw, bias=bias),
             norm_layer(nf*branch),
-            nn.LeakyReLU(0.2, True)
+            nn.LeakyReLU(0.2, False)
         ]]
 
         sequence += [[nn.Conv2d(nf*branch, 1*branch, groups=branch, kernel_size=kw, stride=1, padding=padw, bias=True)]]
