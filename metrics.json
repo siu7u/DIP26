@@ -1,0 +1,410 @@
+{
+  "rip_full_ceilnet_table2": {
+    "metrics": {
+      "LMSE": 0.005815193057060242,
+      "NCC": 0.9691469073295593,
+      "PSNR": 24.67071603545227,
+      "SSIM": 0.9154800753820872
+    },
+    "run_info": {
+      "checkpoint": "checkpoints/rip_full/errnet_latest.pt",
+      "data_root": "./datasets/processed_data",
+      "dataset": "ceilnet_table2",
+      "hyper": true,
+      "max_long_edge": null,
+      "model_name": "rip_full",
+      "use_rpen": true
+    }
+  },
+  "rip_full_objects": {
+    "metrics": {
+      "LMSE": 0.003783623920753598,
+      "NCC": 0.9813358187675476,
+      "PSNR": 23.941157237544907,
+      "SSIM": 0.8852410754434764
+    },
+    "run_info": {
+      "checkpoint": "checkpoints/rip_full/errnet_latest.pt",
+      "data_root": "./datasets/processed_data",
+      "dataset": "objects",
+      "hyper": true,
+      "max_long_edge": null,
+      "model_name": "rip_full",
+      "use_rpen": true
+    }
+  },
+  "rip_full_postcard": {
+    "metrics": {
+      "LMSE": 0.005136609543114901,
+      "NCC": 0.9279579520225525,
+      "PSNR": 21.34332222177582,
+      "SSIM": 0.8695249718607613
+    },
+    "run_info": {
+      "checkpoint": "checkpoints/rip_full/errnet_latest.pt",
+      "data_root": "./datasets/processed_data",
+      "dataset": "postcard",
+      "hyper": true,
+      "max_long_edge": null,
+      "model_name": "rip_full",
+      "use_rpen": true
+    }
+  },
+  "rip_full_real20": {
+    "metrics": {
+      "LMSE": 0.02070816233754158,
+      "NCC": 0.8863741755485535,
+      "PSNR": 23.12053483543229,
+      "SSIM": 0.821630029047428
+    },
+    "run_info": {
+      "checkpoint": "checkpoints/rip_full/errnet_latest.pt",
+      "data_root": "./datasets/processed_data",
+      "dataset": "real20",
+      "hyper": true,
+      "max_long_edge": null,
+      "model_name": "rip_full",
+      "use_rpen": true
+    }
+  },
+  "rip_full_sir2_withgt": {
+    "metrics": {
+      "LMSE": 0.004803425166755915,
+      "NCC": 0.9530665278434753,
+      "PSNR": 23.21457136113498,
+      "SSIM": 0.8829780973556886
+    },
+    "run_info": {
+      "checkpoint": "checkpoints/rip_full/errnet_latest.pt",
+      "data_root": "./datasets/processed_data",
+      "dataset": "sir2_withgt",
+      "hyper": true,
+      "max_long_edge": null,
+      "model_name": "rip_full",
+      "use_rpen": true
+    }
+  },
+  "rip_full_wild": {
+    "metrics": {
+      "LMSE": 0.006232336163520813,
+      "NCC": 0.9415878653526306,
+      "PSNR": 25.09215968453411,
+      "SSIM": 0.9023396205837491
+    },
+    "run_info": {
+      "checkpoint": "checkpoints/rip_full/errnet_latest.pt",
+      "data_root": "./datasets/processed_data",
+      "dataset": "wild",
+      "hyper": true,
+      "max_long_edge": null,
+      "model_name": "rip_full",
+      "use_rpen": true
+    }
+  },
+  "rip_input_only_ceilnet_table2": {
+    "metrics": {
+      "LMSE": 0.0058903140015900135,
+      "NCC": 0.971616804599762,
+      "PSNR": 26.23775553260617,
+      "SSIM": 0.9252277097330581
+    },
+    "run_info": {
+      "checkpoint": "checkpoints/rip_input_only/errnet_latest.pt",
+      "data_root": "./datasets/processed_data",
+      "dataset": "ceilnet_table2",
+      "hyper": true,
+      "max_long_edge": null,
+      "model_name": "rip_input_only",
+      "use_rpen": true
+    }
+  },
+  "rip_input_only_objects": {
+    "metrics": {
+      "LMSE": 0.0034313469659537077,
+      "NCC": 0.9802943468093872,
+      "PSNR": 24.080575311904322,
+      "SSIM": 0.8919182097947581
+    },
+    "run_info": {
+      "checkpoint": "checkpoints/rip_input_only/errnet_latest.pt",
+      "data_root": "./datasets/processed_data",
+      "dataset": "objects",
+      "hyper": true,
+      "max_long_edge": null,
+      "model_name": "rip_input_only",
+      "use_rpen": true
+    }
+  },
+  "rip_input_only_postcard": {
+    "metrics": {
+      "LMSE": 0.008497240953147411,
+      "NCC": 0.877916157245636,
+      "PSNR": 19.939221251304634,
+      "SSIM": 0.8409415454477394
+    },
+    "run_info": {
+      "checkpoint": "checkpoints/rip_input_only/errnet_latest.pt",
+      "data_root": "./datasets/processed_data",
+      "dataset": "postcard",
+      "hyper": true,
+      "max_long_edge": null,
+      "model_name": "rip_input_only",
+      "use_rpen": true
+    }
+  },
+  "rip_input_only_real20": {
+    "metrics": {
+      "LMSE": 0.020114442333579063,
+      "NCC": 0.8942831754684448,
+      "PSNR": 23.32456487744608,
+      "SSIM": 0.8258659829435571
+    },
+    "run_info": {
+      "checkpoint": "checkpoints/rip_input_only/errnet_latest.pt",
+      "data_root": "./datasets/processed_data",
+      "dataset": "real20",
+      "hyper": true,
+      "max_long_edge": null,
+      "model_name": "rip_input_only",
+      "use_rpen": true
+    }
+  },
+  "rip_input_only_sir2_withgt": {
+    "metrics": {
+      "LMSE": 0.0059121581725776196,
+      "NCC": 0.9344364404678345,
+      "PSNR": 22.721878469909875,
+      "SSIM": 0.8742583755084031
+    },
+    "run_info": {
+      "checkpoint": "checkpoints/rip_input_only/errnet_latest.pt",
+      "data_root": "./datasets/processed_data",
+      "dataset": "sir2_withgt",
+      "hyper": true,
+      "max_long_edge": null,
+      "model_name": "rip_input_only",
+      "use_rpen": true
+    }
+  },
+  "rip_input_only_wild": {
+    "metrics": {
+      "LMSE": 0.006243165582418442,
+      "NCC": 0.943798303604126,
+      "PSNR": 24.96302969497368,
+      "SSIM": 0.8983350658409534
+    },
+    "run_info": {
+      "checkpoint": "checkpoints/rip_input_only/errnet_latest.pt",
+      "data_root": "./datasets/processed_data",
+      "dataset": "wild",
+      "hyper": true,
+      "max_long_edge": null,
+      "model_name": "rip_input_only",
+      "use_rpen": true
+    }
+  },
+  "rip_prior_bg_ceilnet_table2": {
+    "metrics": {
+      "LMSE": 0.005724770482629538,
+      "NCC": 0.9696416258811951,
+      "PSNR": 24.939659066517798,
+      "SSIM": 0.9186455039081386
+    },
+    "run_info": {
+      "checkpoint": "checkpoints/rip_prior_bg/errnet_latest.pt",
+      "data_root": "./datasets/processed_data",
+      "dataset": "ceilnet_table2",
+      "hyper": true,
+      "max_long_edge": null,
+      "model_name": "rip_prior_bg",
+      "use_rpen": true
+    }
+  },
+  "rip_prior_bg_objects": {
+    "metrics": {
+      "LMSE": 0.0036391147878021,
+      "NCC": 0.981691837310791,
+      "PSNR": 24.05009899424256,
+      "SSIM": 0.8876166194544344
+    },
+    "run_info": {
+      "checkpoint": "checkpoints/rip_prior_bg/errnet_latest.pt",
+      "data_root": "./datasets/processed_data",
+      "dataset": "objects",
+      "hyper": true,
+      "max_long_edge": null,
+      "model_name": "rip_prior_bg",
+      "use_rpen": true
+    }
+  },
+  "rip_prior_bg_postcard": {
+    "metrics": {
+      "LMSE": 0.005690591875463724,
+      "NCC": 0.9070681929588318,
+      "PSNR": 21.018831439393097,
+      "SSIM": 0.8594571432833252
+    },
+    "run_info": {
+      "checkpoint": "checkpoints/rip_prior_bg/errnet_latest.pt",
+      "data_root": "./datasets/processed_data",
+      "dataset": "postcard",
+      "hyper": true,
+      "max_long_edge": null,
+      "model_name": "rip_prior_bg",
+      "use_rpen": true
+    }
+  },
+  "rip_prior_bg_real20": {
+    "metrics": {
+      "LMSE": 0.020667707547545433,
+      "NCC": 0.8839638829231262,
+      "PSNR": 23.131204900692914,
+      "SSIM": 0.8235232333166053
+    },
+    "run_info": {
+      "checkpoint": "checkpoints/rip_prior_bg/errnet_latest.pt",
+      "data_root": "./datasets/processed_data",
+      "dataset": "real20",
+      "hyper": true,
+      "max_long_edge": null,
+      "model_name": "rip_prior_bg",
+      "use_rpen": true
+    }
+  },
+  "rip_prior_bg_sir2_withgt": {
+    "metrics": {
+      "LMSE": 0.004708315711468458,
+      "NCC": 0.947016179561615,
+      "PSNR": 23.165466480611776,
+      "SSIM": 0.8806283752567812
+    },
+    "run_info": {
+      "checkpoint": "checkpoints/rip_prior_bg/errnet_latest.pt",
+      "data_root": "./datasets/processed_data",
+      "dataset": "sir2_withgt",
+      "hyper": true,
+      "max_long_edge": null,
+      "model_name": "rip_prior_bg",
+      "use_rpen": true
+    }
+  },
+  "rip_prior_bg_wild": {
+    "metrics": {
+      "LMSE": 0.005084671080112457,
+      "NCC": 0.9491497278213501,
+      "PSNR": 25.218151328651285,
+      "SSIM": 0.9043115602440894
+    },
+    "run_info": {
+      "checkpoint": "checkpoints/rip_prior_bg/errnet_latest.pt",
+      "data_root": "./datasets/processed_data",
+      "dataset": "wild",
+      "hyper": true,
+      "max_long_edge": null,
+      "model_name": "rip_prior_bg",
+      "use_rpen": true
+    }
+  },
+  "rip_prior_sup_ceilnet_table2": {
+    "metrics": {
+      "LMSE": 0.004916579928249121,
+      "NCC": 0.9774211645126343,
+      "PSNR": 27.077847189490356,
+      "SSIM": 0.9341898825796022
+    },
+    "run_info": {
+      "checkpoint": "checkpoints/rip_prior_sup/errnet_latest.pt",
+      "data_root": "./datasets/processed_data",
+      "dataset": "ceilnet_table2",
+      "hyper": true,
+      "max_long_edge": null,
+      "model_name": "rip_prior_sup",
+      "use_rpen": true
+    }
+  },
+  "rip_prior_sup_objects": {
+    "metrics": {
+      "LMSE": 0.0037331816274672747,
+      "NCC": 0.9804909229278564,
+      "PSNR": 23.70210389225055,
+      "SSIM": 0.8845808279183381
+    },
+    "run_info": {
+      "checkpoint": "checkpoints/rip_prior_sup/errnet_latest.pt",
+      "data_root": "./datasets/processed_data",
+      "dataset": "objects",
+      "hyper": true,
+      "max_long_edge": null,
+      "model_name": "rip_prior_sup",
+      "use_rpen": true
+    }
+  },
+  "rip_prior_sup_postcard": {
+    "metrics": {
+      "LMSE": 0.00540342228487134,
+      "NCC": 0.9270265698432922,
+      "PSNR": 21.650564989070343,
+      "SSIM": 0.8694593350865987
+    },
+    "run_info": {
+      "checkpoint": "checkpoints/rip_prior_sup/errnet_latest.pt",
+      "data_root": "./datasets/processed_data",
+      "dataset": "postcard",
+      "hyper": true,
+      "max_long_edge": null,
+      "model_name": "rip_prior_sup",
+      "use_rpen": true
+    }
+  },
+  "rip_prior_sup_real20": {
+    "metrics": {
+      "LMSE": 0.022890053689479828,
+      "NCC": 0.8732181787490845,
+      "PSNR": 23.284226711328873,
+      "SSIM": 0.8149712504615045
+    },
+    "run_info": {
+      "checkpoint": "checkpoints/rip_prior_sup/errnet_latest.pt",
+      "data_root": "./datasets/processed_data",
+      "dataset": "real20",
+      "hyper": true,
+      "max_long_edge": null,
+      "model_name": "rip_prior_sup",
+      "use_rpen": true
+    }
+  },
+  "rip_prior_sup_sir2_withgt": {
+    "metrics": {
+      "LMSE": 0.004801115952432156,
+      "NCC": 0.9526192545890808,
+      "PSNR": 23.169330151696723,
+      "SSIM": 0.8822173560858834
+    },
+    "run_info": {
+      "checkpoint": "checkpoints/rip_prior_sup/errnet_latest.pt",
+      "data_root": "./datasets/processed_data",
+      "dataset": "sir2_withgt",
+      "hyper": true,
+      "max_long_edge": null,
+      "model_name": "rip_prior_sup",
+      "use_rpen": true
+    }
+  },
+  "rip_prior_sup_wild": {
+    "metrics": {
+      "LMSE": 0.005848377477377653,
+      "NCC": 0.942782998085022,
+      "PSNR": 24.806005557630954,
+      "SSIM": 0.9001479639312359
+    },
+    "run_info": {
+      "checkpoint": "checkpoints/rip_prior_sup/errnet_latest.pt",
+      "data_root": "./datasets/processed_data",
+      "dataset": "wild",
+      "hyper": true,
+      "max_long_edge": null,
+      "model_name": "rip_prior_sup",
+      "use_rpen": true
+    }
+  }
+}

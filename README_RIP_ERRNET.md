@@ -257,13 +257,13 @@ python test_errnet.py \
 python train_errnet.py --name rip_input_only --hyper --use_rpen --lambda_prior 0 --lambda_bg 0 --lambda_prior_tv 0
 
 # 3. 加入 prior supervision
-python train_errnet.py --name rip_prior_sup --hyper --use_rpen --lambda_prior 1.0 --lambda_bg 0 --lambda_prior_tv 0
+CUDA_VISIBLE_DEVICES=1 python train_errnet.py --name rip_prior_sup --hyper --use_rpen --lambda_prior 1.0 --lambda_bg 0 --lambda_prior_tv 0
 
 # 4. 加入 background preservation
-python train_errnet.py --name rip_prior_bg --hyper --use_rpen --lambda_prior 1.0 --lambda_bg 0.5 --lambda_prior_tv 0
+CUDA_VISIBLE_DEVICES=2 python train_errnet.py --name rip_prior_bg --hyper --use_rpen --lambda_prior 1.0 --lambda_bg 0.5 --lambda_prior_tv 0
 
 # 5. 完整方法
-python train_errnet.py --name rip_full --hyper --use_rpen --lambda_prior 1.0 --lambda_bg 0.5 --lambda_prior_tv 0.00005
+CUDA_VISIBLE_DEVICES=3 python train_errnet.py --name rip_full --hyper --use_rpen --lambda_prior 1.0 --lambda_bg 0.5 --lambda_prior_tv 0.00005
 ```
 
 推荐指标：

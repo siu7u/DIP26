@@ -23,7 +23,7 @@ class TrainOptions(BaseOptions):
         self.parser.add_argument('--high_gamma', type=float, default=1.3, help='max gamma in synthetic dataset')
         
         # data augmentation
-        self.parser.add_argument('--batchSize', '-b', type=int, default=1, help='input batch size')
+        self.parser.add_argument('--batchSize', '-b', type=int, default=4, help='input batch size')
         self.parser.add_argument('--loadSize', type=str, default='224,336,448', help='scale images to multiple size')
         self.parser.add_argument('--fineSize', type=str, default='224,224', help='then crop to this size')
         self.parser.add_argument('--no_flip', action='store_true', help='if specified, do not flip the images for data augmentation')

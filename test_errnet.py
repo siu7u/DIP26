@@ -1,7 +1,10 @@
 import argparse
+import json
+import os
 import sys
 from os.path import join
 
+import numpy as np
 import torch.backends.cudnn as cudnn
 
 import data.reflect_dataset as datasets
@@ -128,6 +131,64 @@ def build_test_dataloader(opt, dataset_key, input_dir, max_long_edge=None):
     return save_subdir, dataloader
 
 
+def meters_to_dict(avg_meters):
+    return {key: to_jsonable(avg_meters[key]) for key in avg_meters.keys()}
+
+
+def to_jsonable(value):
+    if isinstance(value, np.generic):
+        return value.item()
+    if isinstance(value, dict):
+        return {key: to_jsonable(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [to_jsonable(item) for item in value]
+    return value
+
+
+def update_summary_json(result_dir, save_subdir, metrics=None, run_info=None):
+    os.makedirs(result_dir, exist_ok=True)
+    summary_path = join(result_dir, "metrics.json")
+    if os.path.exists(summary_path):
+        try:
+            with open(summary_path, "r") as f:
+                summary = json.load(f)
+        except json.JSONDecodeError:
+            summary = {}
+    else:
+        summary = {}
+
+    entry = {}
+    if metrics is not None:
+        entry["metrics"] = to_jsonable(metrics)
+    if run_info is not None:
+        entry["run_info"] = to_jsonable(run_info)
+    summary[save_subdir] = entry
+
+    with open(summary_path, "w") as f:
+        json.dump(summary, f, indent=2, sort_keys=True)
+
+
+def save_metrics(savedir, result_dir, save_subdir, metrics, run_info=None):
+    os.makedirs(savedir, exist_ok=True)
+    update_summary_json(result_dir, save_subdir, metrics=metrics, run_info=run_info)
+
+    with open(join(savedir, "metrics.txt"), "w") as f:
+        if run_info is not None:
+            f.write("[run_info]\n")
+            for key in sorted(run_info.keys()):
+                f.write("{}: {}\n".format(key, run_info[key]))
+            f.write("\n[metrics]\n")
+        for key in sorted(metrics.keys()):
+            f.write("{}: {:.6f}\n".format(key, metrics[key]))
+
+
+def save_run_info(savedir, result_dir, save_subdir, run_info):
+    os.makedirs(savedir, exist_ok=True)
+    update_summary_json(result_dir, save_subdir, run_info=run_info)
+    with open(join(savedir, "run_info.json"), "w") as f:
+        json.dump(run_info, f, indent=2, sort_keys=True)
+
+
 def main():
     cli_args = parse_test_args()
     option_parser = TrainOptions()
@@ -150,10 +211,27 @@ def main():
             max_long_edge=cli_args.max_long_edge,
         )
         save_subdir = cli_args.save_subdir or spec["save_subdir"]
+        savedir = join(cli_args.result_dir, save_subdir)
         res = engine.eval(
             dataloader,
             dataset_name=spec["dataset_name"],
-            savedir=join(cli_args.result_dir, save_subdir),
+            savedir=savedir,
+        )
+        metrics = meters_to_dict(res)
+        save_metrics(
+            savedir,
+            cli_args.result_dir,
+            save_subdir,
+            metrics,
+            run_info={
+                "dataset": cli_args.dataset,
+                "data_root": cli_args.data_root,
+                "model_name": opt.name,
+                "checkpoint": opt.icnn_path,
+                "use_rpen": getattr(opt, "use_rpen", False),
+                "hyper": getattr(opt, "hyper", False),
+                "max_long_edge": cli_args.max_long_edge,
+            },
         )
         print(res)
     else:
@@ -164,9 +242,25 @@ def main():
             max_long_edge=cli_args.max_long_edge,
         )
         save_subdir = cli_args.save_subdir or default_save_subdir
+        savedir = join(cli_args.result_dir, save_subdir)
         engine.test(
             dataloader,
-            savedir=join(cli_args.result_dir, save_subdir),
+            savedir=savedir,
+        )
+        save_run_info(
+            savedir,
+            cli_args.result_dir,
+            save_subdir,
+            {
+                "dataset": cli_args.dataset,
+                "input_dir": cli_args.input_dir,
+                "model_name": opt.name,
+                "checkpoint": opt.icnn_path,
+                "use_rpen": getattr(opt, "use_rpen", False),
+                "hyper": getattr(opt, "hyper", False),
+                "max_long_edge": cli_args.max_long_edge,
+                "note": "No metrics are available for test-only datasets without ground truth.",
+            },
         )
 
 
