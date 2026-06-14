@@ -118,7 +118,15 @@ python train_errnet.py --name errnet_cpu --hyper --gpu_ids -1
 
 ```bash
 # gpu
-python train_errnet_unaligned.py --name errnet_unaligned_ft --hyper -r --icnn_path checkpoints/errnet/errnet_060_00463920.pt --unaligned_loss vgg
+CUDA_VISIBLE_DEVICES=0 python train_errnet_unaligned.py --name errnet_unaligned_ft --hyper -r --icnn_path /home/zihengcai/DIP26/checkpoints/rip_full/errnet_latest.pt --unaligned_loss vgg  --use_rpen
+
+CUDA_VISIBLE_DEVICES=1 python train_errnet_unaligned.py --name errnet_unaligned_ft --hyper -r --icnn_path /home/zihengcai/DIP26/checkpoints/rip_input_only/errnet_latest.pt --unaligned_loss vgg --use_rpen
+
+CUDA_VISIBLE_DEVICES=2 python train_errnet_unaligned.py --name errnet_unaligned_ft --hyper -r --icnn_path /home/zihengcai/DIP26/checkpoints/rip_prior_bg/errnet_latest.pt --unaligned_loss vgg --use_rpen
+
+CUDA_VISIBLE_DEVICES=3 python train_errnet_unaligned.py --name errnet_unaligned_ft --hyper -r --icnn_path /home/zihengcai/DIP26/checkpoints/rip_prior_sup/errnet_latest.pt --unaligned_loss vgg --use_rpen
+
+
 # cpu
 python train_errnet_unaligned.py --name errnet_unaligned_ft_cpu --hyper -r --gpu_ids -1 --icnn_path checkpoints/errnet/errnet_060_00463920.pt --unaligned_loss vgg
 ```

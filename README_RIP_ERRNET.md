@@ -196,13 +196,37 @@ python train_errnet.py \
 RIP-ERRNet 也可以接到 unaligned fine-tuning 中：
 
 ```bash
-python train_errnet_unaligned.py \
-  --name rip_errnet_unaligned_ft \
+ CUDA_VISIBLE_DEVICES=0 nohup python test_errnet.py \
+  --dataset ceilnet_table2 \
+  --name rip_full_unaligned \
   --hyper \
   --use_rpen \
   -r \
-  --icnn_path checkpoints/errnet/errnet_060_00463920.pt \
-  --unaligned_loss ctx_vgg
+  --icnn_path checkpoints/rip_full/errnet_latest.pt
+
+ CUDA_VISIBLE_DEVICES=1 nohup python test_errnet.py \
+  --dataset ceilnet_table2 \
+  --name rip_input_only_unaligned \
+  --hyper \
+  --use_rpen \
+  -r \
+  --icnn_path checkpoints/rip_input_only/errnet_latest.pt
+
+ CUDA_VISIBLE_DEVICES=2 nohup python test_errnet.py \
+  --dataset ceilnet_table2 \
+  --name rip_prior_bg_unaligned \
+  --hyper \
+  --use_rpen \
+  -r \
+  --icnn_path checkpoints/rip_prior_bg/errnet_latest.pt
+  
+ CUDA_VISIBLE_DEVICES=3 nohup python test_errnet.py \
+  --dataset ceilnet_table2 \
+  --name rip_prior_sup_unaligned \
+  --hyper \
+  --use_rpen \
+  -r \
+  --icnn_path checkpoints/rip_prior_sup/errnet_latest.pt
 ```
 
 注意：对于 unaligned samples，`P_gt = normalize(|I - T|)` 不再可靠，因此 prior supervision 和 background preservation loss 只在 aligned samples 上启用。RPEN 仍然会通过最终 restoration loss 被间接更新。

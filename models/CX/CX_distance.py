@@ -114,8 +114,8 @@ class CSFlow:
         cosine_dist_l = []
         N = T_features.size()[0]
         for i in range(N):
-            T_features_i = T_features[i, :, :, :].unsqueeze_(0) 
-            I_features_i = I_features[i, :, :, :].unsqueeze_(0)
+            T_features_i = T_features[i, :, :, :].unsqueeze(0)
+            I_features_i = I_features[i, :, :, :].unsqueeze(0)
             patches_PC11_i = cs_flow.patch_decomposition(T_features_i)  # 1CHW --> PC11, with P=H*W (C_out x C_in x H x W)
             cosine_dist_i = torch.nn.functional.conv2d(I_features_i, patches_PC11_i)
             # cosine_dist_1HWC = cosine_dist_i.permute((0, 2, 3, 1))
@@ -138,6 +138,7 @@ class CSFlow:
     @staticmethod
     def sum_normalize(cs, axis=TensorAxis.C):
         reduce_sum = torch.sum(cs, dim=axis, keepdim=True)
+        reduce_sum = torch.clamp(reduce_sum, min=1e-8)
         cs_normalize = torch.div(cs, reduce_sum)
         return cs_normalize
 
@@ -155,6 +156,7 @@ class CSFlow:
     @staticmethod
     def l2_normalize_channelwise(features):
         norms = features.norm(p=2, dim=TensorAxis.C, keepdim=True)
+        norms = torch.clamp(norms, min=1e-8)
         features = features.div(norms)
         return features
 
@@ -251,6 +253,7 @@ def CX_loss(I_features, T_features, deformation=False, dis=False):
         k_max_NC = torch.max(torch.max(cs, dim=2)[0], dim=2)[0]
         # reduce mean over C(H*W) dim 
         CS = torch.mean(k_max_NC, dim=1)
+        CS = torch.clamp(CS, min=1e-8)
         # score = 1/CS
         # score = torch.exp(-CS*10)
         score = -torch.log(CS)
