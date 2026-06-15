@@ -12,3 +12,6 @@ bak
 results
 raw_data
 processed_data
+logs/
+*.log
+*.pid

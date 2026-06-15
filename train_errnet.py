@@ -63,6 +63,13 @@ eval_dataloader_real = datasets.DataLoader(
 """Main Loop"""
 engine = Engine(opt)
 
+# Transfer learning from an external checkpoint (e.g. baseline weights via --icnn_path):
+# reset epoch so the training loop actually runs.
+if opt.resume and opt.icnn_path is not None:
+    print('[i] reset epoch/iterations for transfer learning from {}'.format(opt.icnn_path))
+    engine.epoch = 0
+    engine.iterations = 0
+
 def set_learning_rate(lr):
     for optimizer in engine.model.optimizers:
         print('[i] set learning rate to {}'.format(lr))

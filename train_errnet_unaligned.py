@@ -2,6 +2,7 @@ from os.path import join
 from options.errnet.train_options import TrainOptions
 from engine import Engine
 from data.image_folder import read_fns
+import torch
 import torch.backends.cudnn as cudnn
 import data.reflect_dataset as datasets
 import util.util as util
@@ -39,11 +40,23 @@ def set_learning_rate(lr):
         util.set_opt_param(optimizer, 'lr', lr)
 
 
-set_learning_rate(1e-4)
+def has_nan_weights(model):
+    for module in (model.net_i, model.net_rd):
+        if module is None:
+            continue
+        for param in module.parameters():
+            if not torch.isfinite(param).all():
+                return True
+    return False
+
+
+set_learning_rate(opt.lr)
 while engine.epoch < 80:
-    if engine.epoch == 65:
-        set_learning_rate(5e-5)
     if engine.epoch == 70:
-        set_learning_rate(1e-5)
-        
+        set_learning_rate(opt.lr * 0.2)
+
     engine.train(train_dataloader_fusion)
+
+    if has_nan_weights(engine.model):
+        print('[ERROR] NaN/Inf in model weights after epoch %d, stopping.' % engine.epoch)
+        break
